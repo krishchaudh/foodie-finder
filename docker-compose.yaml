@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:14
+    container_name: foodie_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: foodiefinder
+    ports:
+      - "5432:5432"  # database port
+
+  # Backend (Node/Express)
+  backend:
+    build: ./backend
+    container_name: foodie_backend
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: example
+      DB_NAME: foodiefinder
+      JWT_SECRET: supersecretkey
+    ports:
+      - "5001:5000"  # Map container port 5000 to host port 5001
+    depends_on:
+      - db
+
+  # Frontend (React)
+  frontend:
+    build: ./frontend
+    container_name: foodie_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
